@@ -25,5 +25,15 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: Avalien
+      fonts:
+        - asset: assets/Avalien.ttf
+    - family: Autumn
+      fonts:
+        - asset: assets/Autumn Moon.ttf
+
   assets:
     - images/
+    - images/weather/
+    - images/banner/

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:self_utils/global/store.dart';
+import 'package:self_utils/utils/log_utils.dart';
 import 'package:self_utils/utils/screen.dart';
 import 'package:self_utils/widget/app_lifecycle_widget.dart';
 import 'package:self_utils/widget/keyboard/keyboard_root.dart';
@@ -57,7 +58,7 @@ class MyAppState extends State<MyApp> {
           child: ModalStyleWidget(
             child: MaterialApp(
               builder: BotToastInit(),
-              title: 'Flutter Study',
+              title: 'DataBase Pub',
               navigatorObservers: <NavigatorObserver>[
                 BotToastNavigatorObserver()
               ],
