@@ -32,6 +32,9 @@ flutter:
     - family: Autumn
       fonts:
         - asset: assets/Autumn Moon.ttf
+    - family: kaiti
+      fonts:
+        - asset: assets/fangzheng.ttf
 
   assets:
     - images/

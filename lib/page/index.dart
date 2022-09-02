@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:self_flutter_web/page/component/stack_img_widget.dart';
-import 'package:self_flutter_web/page/slide_image/movie.dart';
 import 'package:self_utils/utils/array_helper.dart';
 import 'package:self_utils/utils/screen.dart';
+
+import '../model/Img_model.dart';
 
 class IndexPage extends StatefulWidget {
   const IndexPage({Key? key}) : super(key: key);
@@ -13,77 +13,43 @@ class IndexPage extends StatefulWidget {
 
 class _IndexPageState extends State<IndexPage> {
   late ScrollController controller;
-
-  // PageController scrollController = PageController();
-  double offset = 0;
+  double offset = 0; //视差
+  double progressOffset = 0; //滚动条进度
   int currentIndex = 0;
 
-  List<Movie> movies = <Movie>[
-    Movie(
-      name: '',
-      desc: '',
-      image: 'images/banner/06.jpg',
-      date: '2021-09-03',
-    ),
-    Movie(
-      name: '',
-      desc: '',
-      image: 'images/banner/01.jpeg',
-      date: '2021-05-21',
-    ),
-    Movie(
-      name: '',
-      desc: '',
-      image: 'images/banner/02.jpeg',
-      date: '2021-05-21',
-    ),
-    Movie(
-      name: '',
-      desc: '',
-      image: 'images/banner/11.jpg',
-      date: '2021-05-21',
-    ),
-    Movie(
-      name: '',
-      desc: '',
-      image: 'images/banner/10.jpg',
-      date: '2021-05-21',
-    ),
-    Movie(
-      name: '',
-      desc: '',
-      image: 'images/banner/68.jpg',
-      date: '2021-05-21',
-    ),
-    Movie(
-      name: '',
-      desc: '',
-      image: 'images/banner/55.png',
-      date: '2021-05-21',
-    ),
-    Movie(
-      name: '',
-      desc: '',
-      image: 'images/banner/63.jpg',
-      date: '2021-05-21',
-    ),
-  ];
+  // sliverAppBar 相关
+  double _opacitiy = 0;
+
+  List<ImgWidgetModel> models = <ImgWidgetModel>[];
 
   @override
   void initState() {
+    models = datas;
     controller = ScrollController();
     controller.addListener(() {
       if (controller.offset > controller.position.viewportDimension) {
         double a =
             ((controller.offset - controller.position.viewportDimension) /
                 (controller.position.viewportDimension));
-        setState(() {
-          offset = a - a.floor();
-          currentIndex = a.floor();
-        });
+        offset = a - a.floor();
+        currentIndex = a.floor();
+      } else {
+        double headerOffset =
+            controller.offset / controller.position.viewportDimension;
+        _opacitiy = 1 - headerOffset;
       }
+      progressOffset = double.tryParse(
+          (controller.position.extentBefore /
+              controller.position.viewportDimension)
+              .toStringAsFixed(2))!;
+      setState(() {});
     });
+    setState(() {});
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _opacitiy = 1.0;
+      setState(() {});
+    });
   }
 
   @override
@@ -150,29 +116,96 @@ class _IndexPageState extends State<IndexPage> {
               ],
               flexibleSpace: FlexibleSpaceBar(
                 centerTitle: true,
-                background: Image.asset(
-                  'images/banner/04.jpg',
-                  fit: BoxFit.cover,
+                background: Container(
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: ExactAssetImage('images/banner/04.jpg'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  height: MediaQuery.of(context).size.height,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Spacer(),
+                        AnimatedOpacity(
+                          opacity: _opacitiy,
+                          duration: const Duration(seconds: 2),
+                          curve: Curves.fastOutSlowIn,
+                          child: const Text(
+                            'Welcome To My DataBase',
+                            style: TextStyle(
+                              fontSize: 40,
+                              fontFamily: 'Avalien',
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(
+                              top: screenUtil.adaptive(20),
+                              left: screenUtil.adaptive(450)),
+                          child: AnimatedOpacity(
+                            opacity: _opacitiy,
+                            duration: const Duration(seconds: 2),
+                            curve: Curves.fastOutSlowIn,
+                            child: const Text(
+                              'from xuan',
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                fontSize: 30,
+                                fontFamily: 'Avalien',
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        AnimatedOpacity(
+                          opacity: _opacitiy,
+                          duration: const Duration(seconds: 2),
+                          child: Container(
+                            margin:
+                                const EdgeInsets.only(bottom: 10, right: 50),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: const [
+                                Text(
+                                  'up down',
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontFamily: 'Avalien',
+                                      color: Colors.white),
+                                ),
+                                Icon(
+                                  Icons.arrow_drop_down,
+                                  size: 18,
+                                  color: Colors.white,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  Movie item = ArrayHelper.get(movies, index)!;
-                  return Container(
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                      image: ExactAssetImage(item.image),
-                      alignment:
-                          Alignment(0, currentIndex == index ? -offset : 0),
-                      fit: BoxFit.cover,
-                    )),
-                    height: MediaQuery.of(context).size.height,
-                    child: Text('$index'),
+                  ImgWidgetModel item = ArrayHelper.get(models, index)!;
+                  return _ImgComponent(
+                    model: item,
+                    offset: currentIndex == index ? offset : 0,
+                    progressOffset: progressOffset,
+                    index: index,
                   );
                 },
-                childCount: movies.length,
+                childCount: models.length,
               ),
             )
           ],
@@ -180,4 +213,46 @@ class _IndexPageState extends State<IndexPage> {
       ),
     );
   }
+}
+
+class _ImgComponent extends StatefulWidget {
+  final ImgWidgetModel model;
+  final double offset;
+  final int index;
+  final double progressOffset;
+
+  const _ImgComponent(
+      {Key? key,
+      required this.model,
+      required this.index,
+      required this.offset,
+      required this.progressOffset})
+      : super(key: key);
+
+  @override
+  State<_ImgComponent> createState() => _ImgComponentState();
+}
+
+class _ImgComponentState extends State<_ImgComponent>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: ExactAssetImage(widget.model.image),
+            alignment: Alignment(0, -widget.offset),
+            fit: BoxFit.cover,
+          ),
+        ),
+        height: MediaQuery.of(context).size.height,
+        child: widget.model.child.call(widget.progressOffset, widget.index),
+      ),
+    );
+  }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
